@@ -1,16 +1,21 @@
-#!bin/bash
-# a script to splice all rinex files in a directory and output to the same directory
-# first input is directoy (i.e. 3012375)
-# also adds in marker name (second input)
-# also converts to file with 'M' flag for mixed observations, in case lacking
-# TODO:  Add git control
-
+#!bin/bash a script to splice all rinex files in a directory and output to the
+#same directory first input is directoy (i.e. 3012375) second input is marker
+#name (i.e. "Lake A2") also converts to file with 'M' flag for mixed
+#observations, in case lacking.  Otherwise, teqc sometimes returns an error.
+#assumes a directory structure that looks like:
+#ParentDirectory/InputDirectoryFromArgument1/FolderNamedByDate/RinexFiles.dat
+#Create directories as such and manually drag in the ones you want to splice.  I
+#use this to combine all files from the same local calendar day, rather Rinex
+#Files have filename structure: XXXX###Y.dat, where XXXX is prefix, ### is day
+#of year, and Y is suffix indicating hour of day.  # i.e. pnnn167q.dat   output:
+#one spliced rinex file with filename structure "YYYYMMDD_#######D.dat", where ######
+#is InputDirectoryFromArgument1. # i.e. 20180616_3012258D.dat
 teqc='/mnt/d/wslhome/teqc_CentOSLx86_64d/teqc'
 root_dir=/mnt/f/Sask2018/GNSS1/rinex_spliced/$1/
 for dir_in in "$root_dir"*/ #"$root_dir"*/ # g directory for collection day
 do
 	echo "directory: "$dir_in
-	date=$(echo $dir_in | awk -F'/' '{print $7 }') #common date, not DOY
+	date=$(echo $dir_in | awk -F'/' '{print $7 }') #common date, not DOY # NEED to update this if using in a directory structure without exactly 7 levels
 	#echo $date
 	h=$(ls -t "$dir_in"*.dat | tail -1) # sample file ID base name (oldest file in dir.)
 	# echo "h="$h
