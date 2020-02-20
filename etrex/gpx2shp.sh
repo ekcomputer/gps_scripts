@@ -2,6 +2,7 @@
 # first input is relative path for dir of gpx files
 # second and third are input and output top dirs
 # version 3 takes dirs as input
+# version 4 fixes basename parsing
 # put / at end of dir pathnames!
 
 # NOTE: you will need to delete empty files created if the .gpx only held tracks, and you set it to oupt waypoints, etc.
@@ -16,6 +17,7 @@ for file in $bs_dir_in$1/*.gpx
 do
 	echo file: $file
 	filebase="$(echo $file | awk -F'.' '{print $1 }' | awk -F'/' '{print $NF}' | awk '{gsub(/ /, "", $1); print $1$2$3$4}')"
+	filebase=`basename "$file" .gpx`
 	echo filebase: $filebase
 	pth_out="$bs_dir_out$1/$filebase.shp"
 	echo pth_out: $pth_out
