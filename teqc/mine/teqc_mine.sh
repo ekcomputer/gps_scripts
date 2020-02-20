@@ -4,7 +4,7 @@
 # V6 includes receiver SSID and DOY
 # V5 saves to vars 
 
-searchpath="$1" # name of directory w data
+searchpath="/mnt/f/Sask2018/GNSS1" # name of directory w data
 echo -e "Starting mining script for: ""$1""\n\n"
 logs="$searchpath"/rinex/stats
 #rm "$logs"/*.txt
@@ -27,12 +27,12 @@ do
 	elev=$(/mnt/d/wslhome/teqc_CentOSLx86_64d/teqc +meta "$f" 2> /dev/null| grep elevation | awk -F':' '{gsub(/ /, "", $2); print $2}')
 	sats=$(/mnt/d/wslhome/teqc_CentOSLx86_64d/teqc +qc "$f" 2> /dev/null| grep "satellites w/ obs" | awk -F':' '{gsub(/ /, "", $2); print $2}')
 	completeObs=$(/mnt/d/wslhome/teqc_CentOSLx86_64d/teqc +qc "$f" 2> /dev/null| grep "Complete observations" | awk -F':' '{gsub(/ /, "", $2); print $2}')
-	receiver=$(echo $f | awk -F'/' '{print $6}')
-	doyLong=$(echo $f | awk -F'/' '{print $8}')
-	echo "Daylong: ""$dayLong"
+	receiver=$(echo $f | awk -F'/' '{print $7}')
+	doyLong=$(echo $f | awk -F'/' '{print $9}')
 	doy=$(($doyLong - 18000))
 	commonDate=$(echo $start |  awk -F' ' '{print $1}')	
-echo $filename,$bytes,$receiver,$start,$stop,$commonDate,$doy,$sample,$possMissEpochs,$stationName,$stationCode,$lat,$long,$elev,$sats,$completeObs >> $logs/stats.csv
+	#echo $doyLong
+	echo $filename,$bytes,$receiver,$start,$stop,$commonDate,$doy,$sample,$possMissEpochs,$stationName,$stationCode,$lat,$long,$elev,$sats,$completeObs >> $logs/stats.csv
 
 done
 echo "Finished batch mining."
