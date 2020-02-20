@@ -1,13 +1,15 @@
 #!bin/bash
 # a script to mine  filename, size, start/stop, sample interval, possible missing epochs, station name, station code, lat/long/elev, sats
 
+# V6 includes receiver SSID and DOY
 # V5 saves to vars 
+
 searchpath="$1" # name of directory w data
 echo -e "Starting mining script for: ""$1""\n\n"
 logs="$searchpath"/rinex/stats
 #rm "$logs"/*.txt
 echo $logs
-echo "RinexFilename,Bytes,StartTime,StopTime,NumSamples,PossMissEpochs,StationName,StationCode,Latitude,Longitude,Elevation,NumSats,CompleteObs" > $logs/stats.csv
+echo "RinexFilename,Bytes,ReceiverSSID,StartDateTime,StopDateTime,CommonDate,DOY,NumSamples,PossMissEpochs,StationName,StationCode,Latitude,Longitude,Elevation,NumSats,CompleteObs" > $logs/stats.csv
 for f in "$searchpath"/rinex/*/*/*/*.dat
 do
 	echo "Processing: ""$f"
@@ -25,9 +27,14 @@ do
 	elev=$(/mnt/d/wslhome/teqc_CentOSLx86_64d/teqc +meta "$f" 2> /dev/null| grep elevation | awk -F':' '{gsub(/ /, "", $2); print $2}')
 	sats=$(/mnt/d/wslhome/teqc_CentOSLx86_64d/teqc +qc "$f" 2> /dev/null| grep "satellites w/ obs" | awk -F':' '{gsub(/ /, "", $2); print $2}')
 	completeObs=$(/mnt/d/wslhome/teqc_CentOSLx86_64d/teqc +qc "$f" 2> /dev/null| grep "Complete observations" | awk -F':' '{gsub(/ /, "", $2); print $2}')
-	echo $filename,$bytes,$start,$stop,$sample,$possMissEpochs,$stationName,$stationCode,$lat,$long,$elev,$sats,$completeObs >> $logs/stats.csv
+	receiver=$(echo $f | awk -F'/' '{print $6}')
+	doyLong=$(echo $f | awk -F'/' '{print $8}')
+	echo "Daylong: ""$dayLong"
+	doy=$(($doyLong - 18000))
+	commonDate=$(echo $start |  awk -F' ' '{print $1}')	
+echo $filename,$bytes,$receiver,$start,$stop,$commonDate,$doy,$sample,$possMissEpochs,$stationName,$stationCode,$lat,$long,$elev,$sats,$completeObs >> $logs/stats.csv
 
 done
 echo "Finished batch mining."
-
+echo "Time: ";date
 
